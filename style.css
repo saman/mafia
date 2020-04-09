@@ -1,0 +1,28 @@
+.app {
+    padding: 50px !important;
+}
+
+.crossed {
+    text-decoration: line-through;
+}
+
+.button-small {
+    font-size: .8rem;
+    height: 2.3rem;
+    line-height: 2.3rem;
+    padding: 0 1.5rem;
+    float: left;
+    margin-top: 1px;
+    margin-right: 10px;
+}
+
+.button-red {
+    border-color: red !important;
+    color: red !important;
+}
+
+.statistics span {
+    margin-right: 10px;
+    width: 150px;
+    display: inline-block;
+}
