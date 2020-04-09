@@ -174,9 +174,10 @@
                 load: function () {
                     const json_roles = JSON.parse(localStorage.getItem('roles')) || [];
                     const json_players = JSON.parse(localStorage.getItem('players')) || [];
-                    json_roles.map(x => x.player = json_players[x.player]);
-                    json_players.map(x => x.role = json_roles[x.role]);
+                    json_roles.map(x => x.player = json_players[x.player] || {});
+                    json_players.map(x => x.role = json_roles[x.role] || {});
 
+                    console.log(json_roles)
                     this.roles = json_roles;
                     this.players = json_players;
 
