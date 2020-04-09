@@ -32,6 +32,7 @@
             border-color: red !important;
             color: red !important;
         }
+
         .statistics span {
             margin-right: 10px;
             width: 150px;
@@ -45,7 +46,9 @@
         <h1>Mafia Random Role Selector</h1>
         <hr>
         <div class="statistics">
-            <span>Total = <b>{{roles.length}}</b></span><span>Remaining = <b>{{roles.length - players.length}}</b></span>
+            <span>Total = <b>{{roles.length || 0}}</b></span>
+            <span>Remaining =
+                <b>{{roles.length - players.length}}</b></span>
             <br>
             <span v-for="role in roles_count">
                 {{role.name}} = <b>{{role.count}}</b>
@@ -61,7 +64,7 @@
         <ol>
             <li v-for="(role, index) in roles">
                 <button class="button button-outline button-small button-red" @click="removeRole(index)">x</button>
-                <span :class="role.player > -1 ? 'crossed' : ''">
+                <span :class="!isEmptyObj(role.player) ? 'crossed' : ''">
                     {{role.name}}
                 </span>
             </li>
@@ -75,8 +78,11 @@
             <li v-for="(player, index) in players">
                 <button class="button button-outline button-small button-red" @click="removePlayer(index)">x</button>
                 {{player.name}}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {{roles[player.role].name}}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {{player.role.name}}
             </li>
         </ol>
 
@@ -90,6 +96,17 @@
                 players: [],
                 roles: [],
                 default_roles: ['Godfather', 'Mafia', 'Doctor', 'Detective', 'Armoured', 'Sniper', 'Citizen']
+            },
+            created: function () {
+                this.load();
+            },
+            watch: {
+                players: function () {
+                    this.save();
+                },
+                roles: function () {
+                    this.save();
+                }
             },
             computed: {
                 roles_count: function () {
@@ -109,12 +126,13 @@
                 addPlayer: function () {
                     if (this.new_player.length > 0) {
                         if (this.roles.length > 0) {
-                            const new_roles = this.roles.filter(x => x.player == -1);
+                            const new_roles = this.roles.filter(x => this.isEmptyObj(x.player));
                             if (new_roles.length > 0) {
-                                rndIndex = this.rndBetween(0, new_roles.length);
-                                const player = { name: this.new_player, role: rndIndex };
-                                new_roles[rndIndex].player = this.players.length;
+                                const rndIndex = this.rndBetween(0, new_roles.length - 1);
+                                // const roleIndex = this.roles.findIndex(x => x.player == -1 && x.name == new_roles[rndIndex].name);
+                                const player = { name: this.new_player, role: new_roles[rndIndex] };
                                 this.players.push(player);
+                                new_roles[rndIndex].player = this.players[this.players.length - 1];
                                 this.new_player = '';
                             } else {
                                 alert("All roles has been assigned to players.");
@@ -127,26 +145,62 @@
                     }
                 },
                 addRole: function () {
-                    const new_role = { name: this.new_role, player: -1 };
-                    this.roles.push(new_role);
+                    if (this.new_role.length > 0) {
+                        const new_role = { name: this.new_role, player: {} };
+                        this.roles.push(new_role);
+                    } else {
+                        alert("Please select a role.");
+                    }
                 },
                 removeRole: function (index) {
                     const player = this.roles[index].player;
-                    this.roles.splice(index, 1);
-                    if (player > -1) {
-                        this.players = this.players.filter(x => x.role !== index);
+                    if (!this.isEmptyObj(player)) {
+                        playerIndex = this.players.findIndex(x => x === player);
+                        this.players.splice(playerIndex, 1);
                     }
+                    this.roles.splice(index, 1);
                 },
                 removePlayer: function (index) {
-                    this.players.splice(index, 1);
                     this.roles.map(x => {
-                        if (x.player === index) {
-                            x.player = -1;
+                        if (x.player === this.players[index]) {
+                            x.player = {};
                         };
                     });
+                    this.players.splice(index, 1);
                 },
                 rndBetween: function (min, max) {
                     return Math.floor(Math.random() * max) + min;
+                },
+                load: function () {
+                    const json_roles = JSON.parse(localStorage.getItem('roles')) || [];
+                    const json_players = JSON.parse(localStorage.getItem('players')) || [];
+                    json_roles.map(x => x.player = json_players[x.player]);
+                    json_players.map(x => x.role = json_roles[x.role]);
+
+                    this.roles = json_roles;
+                    this.players = json_players;
+
+                },
+                save: function () {
+                    const json_roles = [];
+                    const json_players = [];
+                    this.roles.map(x => {
+                        json_roles.push({
+                            name: x.name,
+                            player: this.players.findIndex(y => y == x.player)
+                        })
+                    })
+                    this.players.map(x => {
+                        json_players.push({
+                            name: x.name,
+                            role: this.roles.findIndex(y => y == x.role)
+                        })
+                    })
+                    localStorage.setItem('roles', JSON.stringify(json_roles));
+                    localStorage.setItem('players', JSON.stringify(json_players));
+                },
+                isEmptyObj: function (obj) {
+                    return Object.entries(obj).length === 0
                 }
             },
         })
