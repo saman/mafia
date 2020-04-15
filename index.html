@@ -58,7 +58,12 @@
         </ol>
 
     </div>
-    <script src="./script.js"></script>
+    <script>
+        var script = document.createElement('script');
+        script.setAttribute('src', './script.js?' + new Date().getTime());
+        document.head.appendChild(my_awesome_script);
+    </script>
+
 </body>
 
 </html>
