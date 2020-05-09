@@ -5,7 +5,7 @@ var app = new Vue({
         new_role: '',
         players: [],
         roles: [],
-        default_roles: ['Godfather', 'Mafia', 'Doctor', 'Detective', 'Armoured', 'Sniper' ,'Citizen', 'Silencer', 'Natasha']
+        default_roles: ['Godfather', 'Mafia', 'Doctor', 'Detective', 'Armoured', 'Sniper' ,'Citizen', 'Silencer', 'Natasha', 'Freemason', 'Terror']
     },
     created: function () {
         this.load();
