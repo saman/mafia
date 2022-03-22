@@ -8,13 +8,15 @@
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/milligram/1.3.0/milligram.css">
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
     <div id="app" class="app">
         <h1>Mafia Random Role Selector</h1>
+        <hr>
+        <label for=""></label>
+        <input dir="auto" type="text" v-model="default_roles_input">
         <hr>
         <div class="statistics">
             <span>Total = <b>{{roles.length || 0}}</b></span>
@@ -42,22 +44,17 @@
         </ol>
         <hr>
         <label for="player">Players</label>
-        <input id="player" placeholder="Type player's name and hit Enter" type="text" v-model="new_player"
-            @keyup.enter="addPlayer()">
+        <input id="player" placeholder="Type player's name and hit Enter" type="text" v-model="new_player" @keyup.enter="addPlayer()">
         <button @click="addPlayer()">Add new player</button>
         <ol>
             <li v-for="(player, index) in players">
-                <button class="button button-outline button-small button-red" @click="removePlayer(index)">x</button>
-                {{player.name}}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button class="button button-outline button-small button-red" @click="removePlayer(index)">x</button> {{player.name}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {{player.role.name}}
             </li>
         </ol>
 
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script>
         var script = document.createElement('script');
         script.setAttribute('src', './script.js?' + new Date().getTime());

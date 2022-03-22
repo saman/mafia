@@ -5,21 +5,29 @@ var app = new Vue({
         new_role: '',
         players: [],
         roles: [],
-        default_roles: ['Godfather', 'Mafia', 'Doctor', 'Detective', 'Armoured', 'Sniper' ,'Citizen', 'Silencer', 'Natasha', 'Freemason', 'Terror', 'Negotiator', 'Reporter']
+        default_roles_input_values: 'گادفادر، ناتو، گروگانگیر، مافیا، کاراگاه، پزشک، نگهبان، تفنگدار، تکاور، شهروند',
+        // default_roles_input_values: 'Godfather, Mafia, Doctor, Detective, Armoured, Sniper, Citizen, Silencer, Natasha, Freemason, Terror, Negotiator, Reporter'
+        default_roles_input: ''
     },
-    created: function () {
+    created: function() {
         this.load();
     },
     watch: {
-        players: function () {
+        players: function() {
             this.save();
         },
-        roles: function () {
+        roles: function() {
+            this.save();
+        },
+        default_roles_input: function() {
             this.save();
         }
     },
     computed: {
-        roles_count: function () {
+        default_roles: function() {
+            return this.default_roles_input.replaceAll('،', ',').split(',').map(x => x.trim());
+        },
+        roles_count: function() {
             const list = []
             this.default_roles.map(x => list.push({ name: x, count: 0 }));
             this.roles.map(x => {
@@ -33,7 +41,7 @@ var app = new Vue({
         }
     },
     methods: {
-        addPlayer: function () {
+        addPlayer: function() {
             if (this.new_player.length > 0) {
                 if (this.roles.length > 0) {
                     const new_roles = this.roles.filter(x => this.isEmptyObj(x.player));
@@ -53,7 +61,7 @@ var app = new Vue({
                 alert("Player's name is empty.");
             }
         },
-        addRole: function () {
+        addRole: function() {
             if (this.new_role.length > 0) {
                 const new_role = { name: this.new_role, player: {} };
                 this.roles.push(new_role);
@@ -61,7 +69,7 @@ var app = new Vue({
                 alert("Please select a role.");
             }
         },
-        removeRole: function (index) {
+        removeRole: function(index) {
             const player = this.roles[index].player;
             if (!this.isEmptyObj(player)) {
                 playerIndex = this.players.findIndex(x => x === player);
@@ -69,7 +77,7 @@ var app = new Vue({
             }
             this.roles.splice(index, 1);
         },
-        removePlayer: function (index) {
+        removePlayer: function(index) {
             this.roles.map(x => {
                 if (x.player === this.players[index]) {
                     x.player = {};
@@ -77,19 +85,22 @@ var app = new Vue({
             });
             this.players.splice(index, 1);
         },
-        rndBetween: function (min, max) {
+        rndBetween: function(min, max) {
             return Math.floor(Math.random() * max) + min;
         },
-        load: function () {
+        load: function() {
             const json_roles = JSON.parse(localStorage.getItem('roles')) || [];
             const json_players = JSON.parse(localStorage.getItem('players')) || [];
+            const default_roles_input = localStorage.getItem('default_roles_input') || this.default_roles_input_values;
+            console.log(default_roles_input);
             json_roles.map(x => x.player = json_players[x.player] || {});
             json_players.map(x => x.role = json_roles[x.role] || {});
 
             this.roles = json_roles;
             this.players = json_players;
+            this.default_roles_input = default_roles_input;
         },
-        save: function () {
+        save: function() {
             const json_roles = [];
             const json_players = [];
             this.roles.map(x => {
@@ -105,9 +116,10 @@ var app = new Vue({
                 })
             });
             localStorage.setItem('roles', JSON.stringify(json_roles));
+            localStorage.setItem('default_roles_input', this.default_roles_input);
             localStorage.setItem('players', JSON.stringify(json_players));
         },
-        isEmptyObj: function (obj) {
+        isEmptyObj: function(obj) {
             return Object.entries(obj).length === 0;
         }
     },
